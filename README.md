@@ -27,7 +27,8 @@ The usage statement for the code is:
 ```USAGE: python hdibco_submission.py in_image out_image [gpu#]
         in_image is the input image to be binarized
 		out_image is where the binarized image will be written to
-		gpu is an integer device ID to run networks on the specified GPU.  If ommitted, CPU mode is used```
+		gpu is an integer device ID to run networks on the specified GPU.  If ommitted, CPU mode is used
+```
 Using GPU mode requires ~1.2GB of device memory on my combination of hardware/software (GTX 660, CuDNN v5), though your mileage may vary.
 
 References:
