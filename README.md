@@ -32,6 +32,7 @@ The usage statement for the code is:
 Using GPU mode requires ~1.2GB of device memory on my combination of hardware/software (GTX 660, CuDNN v5), though your mileage may vary.
 
 References:
+
 [1] Document Binarization with Automatic Parameter Tuning, N. Howe.  To appear in International Journal of Document Analysis and Recognition. DOI: 10.1007/s10032-012-0192-x.
 
 [2] Wu, Yue, et al. "Learning document image binarization from data." Image Processing (ICIP), 2016 IEEE International Conference on. IEEE, 2016.
