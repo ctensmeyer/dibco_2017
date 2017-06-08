@@ -7,6 +7,7 @@ import caffe
 import cv2
 import matlab.engine
 import scipy.ndimage as nd
+import pydensecrf.densecrf as dcrf
 
 DEBUG = False
 
@@ -189,7 +190,23 @@ def stich_together(locations, subwindows, size):
 		output[y_paste:y_paste+height_paste, x_paste:x_paste+width_paste] = subwindow[y_cut:y_cut+height_paste, x_cut:x_cut+width_paste]
 
 	return output
+
+
+def run_crf(color_im, U, g_sxy=8, g_c=4, b_sxy=64, srgb=8, b_c=4):
+	assert U.shape[0] == 2
+	U = U.reshape((2, -1))
+	d = dcrf.DenseCRF2D(color_im.shape[1], color_im.shape[0], 2)
+	d.setUnaryEnergy(U.astype(np.float32))
+
+	d.addPairwiseGaussian(sxy=(g_sxy,g_sxy), compat=g_c, kernel=dcrf.DIAG_KERNEL, normalization=dcrf.NORMALIZE_SYMMETRIC)
+	d.addPairwiseBilateral(sxy=(b_sxy,b_sxy), srgb=(srgb, srgb, srgb), rgbim=color_im, compat=b_c, 
+							kernel=dcrf.DIAG_KERNEL, normalization=dcrf.NORMALIZE_SYMMETRIC)
+
+	Q = d.inference(5)
+	pred = 255 * (1 - np.argmax(Q, axis=0)).reshape( (color_im.shape[0], color_im.shape[1]) )
+	return pred
 	
+
 def avg_ims(ims):
 	ims = np.concatenate(ims, axis=0)
 	avg_im = ims.mean(axis=0, dtype=float)
@@ -201,6 +218,7 @@ def avg_ims(ims):
 
 	avg_im = avg_im.astype(np.uint8)
 
+
 def main(in_image, out_image):
 	global eng 
 	print "Starting matlab engine"
@@ -208,6 +226,7 @@ def main(in_image, out_image):
 
 	print "Loading Image"
 	image = cv2.imread(in_image, cv2.IMREAD_GRAYSCALE)
+	color_image = cv2.imread(in_image, cv2.IMREAD_COLOR)
 
 	print "Computing RD features"
 	rd_im = relative_darkness(image)
@@ -236,19 +255,35 @@ def main(in_image, out_image):
 
 	for idx, network in enumerate(networks):
 		print "Starting predictions for network %d/%d" % (idx+1, len(networks))
-		binarized_subwindows = predict(network, subwindows)
+		raw_subwindows = predict(network, subwindows)
 
 		print "Reconstructing whole image from binarized tiles"
-		result = stich_together(locations, binarized_subwindows, tuple(image.shape[0:2]))
+		result = stich_together(locations, raw_subwindows, tuple(image.shape[0:2]))
 
-		result = 255 * result
+		result = result
 		if DEBUG:
-			cv2.imwrite("out_%d.png" % idx, result)
+			cv2.imwrite("out_%d.png" % idx, (255 * result).astype(np.uint8))
 
 		results.append(result)
 
-	print "Writing Image"
-	cv2.imwrite(out_image, result)
+	print "Averaging Predictions"
+	average_result = np.average(np.concatenate(map(lambda arr: arr[np.newaxis,:,:], results), axis=0), axis=0)
+	if DEBUG:
+		low_idx = average_result < 0.5
+		bin_result = np.zero(average_result.shape, dtype=np.uint8)
+		bin_result[low_idx] = 255
+		cv2.imwrite("unary.png", bin_result)
+
+	print "Running CRF Inference"
+	EPS = 10e-4
+	prob_1 = np.clip(prob_1, EPS, 1 - EPS)
+	prob_0 = 1 - prob_1
+	combined = np.concatenate([prob_0[np.newaxis,:,:], prob_1[np.newaxis,:,:]], axis=0)
+	U = -1 * np.log(combined)
+	crf_result = run_crf(color_image, U)
+	
+	print "Writing Final Result"
+	cv2.imwrite(out_image, crf_result)
 
 	print "Done"
 	print "Exiting"
