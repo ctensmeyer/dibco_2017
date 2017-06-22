@@ -9,7 +9,7 @@ import matlab.engine
 import scipy.ndimage as nd
 import pydensecrf.densecrf as dcrf
 
-DEBUG = True
+DEBUG = False
 
 
 # acceptable image suffixes

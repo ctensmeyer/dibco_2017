@@ -153,7 +153,7 @@ def get_subwindows(im):
 
 
 def stich_together(locations, subwindows, size):
-	output = np.zeros(size, dtype=np.uint8)
+	output = np.zeros(size, dtype=np.float32)
 	for location, subwindow in zip(locations, subwindows):
 		outer_bounding_box, inner_bounding_box, y_type, x_type = location
 		y_paste, x_paste, y_cut, x_cut, height_paste, width_paste = -1, -1, -1, -1, -1, -1
@@ -262,7 +262,7 @@ def main(in_image, out_image):
 
 		result = result
 		if DEBUG:
-			cv2.imwrite("out_%d.png" % idx, (255 * result).astype(np.uint8))
+			cv2.imwrite("out_%d.png" % idx, 255 - (255 * result).astype(np.uint8))
 
 		results.append(result)
 
@@ -270,13 +270,13 @@ def main(in_image, out_image):
 	average_result = np.average(np.concatenate(map(lambda arr: arr[np.newaxis,:,:], results), axis=0), axis=0)
 	if DEBUG:
 		low_idx = average_result < 0.5
-		bin_result = np.zero(average_result.shape, dtype=np.uint8)
+		bin_result = np.zeros(average_result.shape, dtype=np.uint8)
 		bin_result[low_idx] = 255
 		cv2.imwrite("unary.png", bin_result)
 
 	print "Running CRF Inference"
 	EPS = 10e-4
-	prob_1 = np.clip(prob_1, EPS, 1 - EPS)
+	prob_1 = np.clip(average_result, EPS, 1 - EPS)
 	prob_0 = 1 - prob_1
 	combined = np.concatenate([prob_0[np.newaxis,:,:], prob_1[np.newaxis,:,:]], axis=0)
 	U = -1 * np.log(combined)

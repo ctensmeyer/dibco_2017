@@ -24,12 +24,14 @@ As I don't own the code from [1], all licencing restrictions of that code apply 
 Calling this MATLAB code from `dibco_submission.py` requires installing the matlab.engine module (https://www.mathworks.com/help/matlab/matlab_external/install-the-matlab-engine-for-python.html).
 
 The usage statement for the code is:
-```USAGE: python hdibco_submission.py in_image out_image [gpu#]
+```USAGE: python dibco_submission.py in_image out_image [gpu#]
         in_image is the input image to be binarized
 		out_image is where the binarized image will be written to
 		gpu is an integer device ID to run networks on the specified GPU.  If ommitted, CPU mode is used
 ```
 Using GPU mode requires ~1.2GB of device memory on my combination of hardware/software (GTX 660, CuDNN v5), though your mileage may vary.
+
+The script dibco_submission2.py runs the ensemble of FCNs and outputs the raw predictions with no CRF post-processing.
 
 References:
 
