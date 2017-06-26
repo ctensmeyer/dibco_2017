@@ -31,7 +31,7 @@ The usage statement for the code is:
 ```
 Using GPU mode requires ~1.2GB of device memory on my combination of hardware/software (GTX 660, CuDNN v5), though your mileage may vary.
 
-The script dibco_submission2.py runs the ensemble of FCNs and outputs the raw predictions with no CRF post-processing.
+The script dibco_submission_no_crf.py runs the ensemble of FCNs and outputs the raw predictions with no CRF post-processing.
 
 References:
 
