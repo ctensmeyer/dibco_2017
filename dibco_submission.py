@@ -19,7 +19,7 @@ NET_FILE = os.path.join(os.path.dirname(__file__), "model.prototxt")
 WEIGHTS_DIR = os.path.join(os.path.dirname(__file__), "weights")
 
 TILE_SIZE = 256
-PADDING_SIZE = 21
+PADDING_SIZE = 32
 
 # number of subwindows processed by a network in a batch
 # Higher numbers speed up processing (only marginally if BATCH_SIZE > 16)
@@ -239,7 +239,7 @@ def main(in_image, out_image):
 		cv2.imwrite('howe.png', howe_im)
 
 	print "Concating inputs"
-	data = np.concatenate([image[:,:,np.newaxis], howe_im[:,:,np.newaxis], rd_im], axis=2)
+	data = np.concatenate([image[:,:,np.newaxis], rd_im, howe_im[:,:,np.newaxis]], axis=2)
 
 	print "Preprocessing"
 	data = 0.003921568 * (data - 127.)
@@ -272,7 +272,7 @@ def main(in_image, out_image):
 		low_idx = average_result < 0.5
 		bin_result = np.zeros(average_result.shape, dtype=np.uint8)
 		bin_result[low_idx] = 255
-		cv2.imwrite("unary.png", bin_result)
+		cv2.imwrite(out_image[:-4] + "_unary.png", bin_result)
 
 	print "Running CRF Inference"
 	EPS = 10e-4
@@ -291,7 +291,7 @@ def main(in_image, out_image):
 
 if __name__ == "__main__":
 	if len(sys.argv) < 2:
-		print "USAGE: python hdibco_submission.py in_image out_image [gpu#]"
+		print "USAGE: python dibco_submission.py in_image out_image [gpu#]"
 		print "\tin_image is the input image to be binarized"
 		print "\tout_image is where the binarized image will be written to"
 		print "\tgpu is an integer device ID to run networks on the specified GPU.  If ommitted, CPU mode is used"
