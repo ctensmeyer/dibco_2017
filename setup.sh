@@ -34,7 +34,7 @@ pip install -U cython
 pip install git+https://github.com/lucasb-eyer/pydensecrf.git
 
 mkdir $CAFFE_ROOT
-cd $CAFFE_ROOT
+pushd $CAFFE_ROOT
 
 git clone --depth 1 https://github.com/waldol1/caffe.git .
 for req in $(cat python/requirements.txt) pydot; do
@@ -48,7 +48,9 @@ make -j"$(nproc)"
 export PYCAFFE_ROOT=$CAFFE_ROOT/python
 export PYTHONPATH=$PYCAFFE_ROOT:$PYTHONPATH
 export PATH=$CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
-export echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
+echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
+
+popd
 
 ./get_howe_code.sh
 
