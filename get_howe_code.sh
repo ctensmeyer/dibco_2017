@@ -16,6 +16,8 @@ unzip -o maxflow-v3.04.src.zip
 mv maxflow-v3.04.src/*.cpp maxflow-v3.04.src/*.h  maxflow-v3.04.src/*.inc  .
 rm -r maxflow-v3.04.src
 
+sed -i 's/int \*dim/mwSize \*dim/g' *.cpp
+
 mex imgcut3.cpp graph.cpp maxflow.cpp
 mex imgcutmulti.cpp graph.cpp maxflow.cpp
 
