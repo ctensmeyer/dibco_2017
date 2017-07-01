@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "What is the path of the MATLAB installation?"
+echo "(To find the path, start MATLAB and run the command 'matlabroot')"
+read MATLAB_ROOT
+
 export DEBIAN_FRONTEND=noninteractive
 export CAFFE_ROOT=/opt/caffe_waldol1
 
@@ -41,14 +45,21 @@ for req in $(cat python/requirements.txt) pydot; do
     pip install $req
 done
 
-mkdir build && cd build && \
-cmake -DCPU_ONLY=1 .. && \
+mkdir build
+cd build
+cmake -DCPU_ONLY=1 ..
 make -j"$(nproc)"
 
 export PYCAFFE_ROOT=$CAFFE_ROOT/python
 export PYTHONPATH=$PYCAFFE_ROOT:$PYTHONPATH
 export PATH=$CAFFE_ROOT/build/tools:$PYCAFFE_ROOT:$PATH
 echo "$CAFFE_ROOT/build/lib" >> /etc/ld.so.conf.d/caffe.conf && ldconfig
+
+popd
+
+pushd "$MATLAB_ROOT/extern/engines/python"
+
+python setup.py install
 
 popd
 
