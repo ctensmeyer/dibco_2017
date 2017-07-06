@@ -2,7 +2,13 @@
 
 echo "What is the path of the MATLAB installation?"
 echo "(To find the path, start MATLAB and run the command 'matlabroot')"
-read MATLAB_ROOT
+read -e -p "MATLAB_ROOT:" MATLAB_ROOT
+
+while [ ! -d "$MATLAB_ROOT" ]
+do
+    echo "Given path does not exist. Please enter the path of the MATLAB installation."
+    read -e -p "MATLAB_ROOT:" MATLAB_ROOT
+done
 
 export DEBIAN_FRONTEND=noninteractive
 export CAFFE_ROOT=/opt/caffe_waldol1
