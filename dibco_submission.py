@@ -18,7 +18,7 @@ IMAGE_SUFFIXES = ('.jpg', '.jpeg', '.tif', '.tiff', '.png', '.bmp', '.ppm', '.pg
 NET_FILE = os.path.join(os.path.dirname(__file__), "model.prototxt")
 WEIGHTS_DIR = os.path.join(os.path.dirname(__file__), "weights")
 
-TILE_SIZE = 256
+TILE_SIZE = 192
 PADDING_SIZE = 32
 
 # number of subwindows processed by a network in a batch
@@ -80,13 +80,8 @@ def relative_darkness(im, window_size=5, threshold=10):
 	return np.concatenate( [lower[:,:,np.newaxis], middle[:,:,np.newaxis], upper[:,:,np.newaxis]], axis=2)
 	
 
-
-def setup_networks():
-	networks = list()
-	for f in os.listdir(WEIGHTS_DIR):
-		network = caffe.Net(NET_FILE, os.path.join(WEIGHTS_DIR, f), caffe.TEST)
-		networks.append(network)
-	return networks
+def setup_network(weight_file):
+	return caffe.Net(NET_FILE, os.path.join(WEIGHTS_DIR, weight_file), caffe.TEST)
 
 
 def fprop(network, ims, batchsize=BATCH_SIZE):
@@ -243,9 +238,6 @@ def main(in_image, out_image):
 
 	print "Preprocessing"
 	data = 0.003921568 * (data - 127.)
-
-	print "Loading networks"
-	networks = setup_networks()
 	print data.shape
 
 	print "Tiling input"
@@ -253,8 +245,10 @@ def main(in_image, out_image):
 
 	results = list()
 
-	for idx, network in enumerate(networks):
-		print "Starting predictions for network %d/%d" % (idx+1, len(networks))
+	weight_files = os.listdir(WEIGHTS_DIR)
+	for idx, weight_file in enumerate(weight_files):
+		network = setup_network(weight_file)
+		print "Starting predictions for network %d/%d" % (idx+1, len(weight_files))
 		raw_subwindows = predict(network, subwindows)
 
 		print "Reconstructing whole image from binarized tiles"
