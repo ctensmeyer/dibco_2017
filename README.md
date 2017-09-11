@@ -1,9 +1,10 @@
-# dibco_2017
-Submission for DIBCO 2017
+# DIBCO 2017 Submission
 
 This repo is my submission to the 2017 Document Image Binarization COmpetition (DIBCO) organized as part of ICDAR 2017.
 The underlying method is described in [Document Image Binarization with Fully Convolutional Neural Networks](https://arxiv.org/abs/1708.03276), though I made some modifications for the competition submission (Howe + RD + Image input, train on all available data, CRF post-processing).
 For the exact paper code, models and docker image, see this [repo](https://github.com/ctensmeyer/binarization_2017).
+
+## Method Description
 
 This method performs binarization using an ensemble of 5 deep Fully Convolutional Networks (FCNs) that operate over multiple image scales, including full resolution.
 The underlying deep learning library is Caffe, and more specifically, my own particular fork of Caffe (https://github.com/waldol1/caffe), which should be installed with the python bindings.
@@ -19,6 +20,8 @@ The resulting average probabilities are post-processed using a Densely Connected
 Inference is done using the mean-field approximation for 5 iterations.
 For implementation, I use a python wrapper [4] for the C++ code provided by the authors of [3].
 See [4] for installation instructions for the densecrf wrapper.
+
+## Usage
 
 As this method relies on [1], I have provided a helper script (`get_howe_code.sh`) to download and compile the MATLAB code from [1].
 If something goes wrong with the script, just download his code manually, and compile the needed .mex files (requires a working install of MATLAB).
@@ -36,6 +39,7 @@ Using GPU mode requires ~1.2GB of device memory on my combination of hardware/so
 
 The script dibco_submission_no_crf.py runs the ensemble of FCNs and outputs the raw predictions with no CRF post-processing.
 
+## Citation
 
 If you find this code useful to your research, please cite my paper:
 ```
