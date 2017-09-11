@@ -2,6 +2,9 @@
 Submission for DIBCO 2017
 
 This repo is my submission to the 2017 Document Image Binarization COmpetition (DIBCO) organized as part of ICDAR 2017.
+The underlying method is described in [Document Image Binarization with Fully Convolutional Neural Networks](https://arxiv.org/abs/1708.03276), though I made some modifications for the competition submission (Howe + RD + Image input, train on all available data, CRF post-processing).
+For the exact paper code, models and docker image, see this [repo](https://github.com/ctensmeyer/binarization_2017).
+
 This method performs binarization using an ensemble of 5 deep Fully Convolutional Networks (FCNs) that operate over multiple image scales, including full resolution.
 The underlying deep learning library is Caffe, and more specifically, my own particular fork of Caffe (https://github.com/waldol1/caffe), which should be installed with the python bindings.
 
@@ -33,6 +36,19 @@ Using GPU mode requires ~1.2GB of device memory on my combination of hardware/so
 
 The script dibco_submission_no_crf.py runs the ensemble of FCNs and outputs the raw predictions with no CRF post-processing.
 
+
+If you find this code useful to your research, please cite my paper:
+```
+@inproceedings{tensmeyer2017_binarization,
+  title={Document Image Binarization with Fully Convolutional Neural Networks},
+  author={Tensmeyer, Chris and Martinez, Tony},
+  booktitle={ICDAR},
+  year={2017},
+  organization={IEEE}
+}
+```
+
+
 References:
 
 [1] Document Binarization with Automatic Parameter Tuning, N. Howe.  To appear in International Journal of Document Analysis and Recognition. DOI: 10.1007/s10032-012-0192-x.
@@ -42,3 +58,4 @@ References:
 [3] Koltun, Vladlen. "Efficient inference in fully connected crfs with gaussian edge potentials." Adv. Neural Inf. Process. Syst 2.3 (2011): 4.
 
 [4] https://github.com/lucasb-eyer/pydensecrf
+
